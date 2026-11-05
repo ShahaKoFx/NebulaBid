@@ -6,7 +6,6 @@
 <title>NebulaBid AI</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-/* ... (CSS qismi o'zgarishsiz qoladi, joy tejash uchun qisqartirdim, o'zingiznikini qoldiring) ... */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
   --bg: #0a0a0a; --card: #111111; --card-2: #161616; --gold: #d4af37;
@@ -205,7 +204,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <script>
-// ⚠️ API MANZILI TO'G'RILANDI (Defis olib tashlandi)
+// API MANZILI (Defissiz, to'g'ri)
 const API = "https://nebulabid.onrender.com";
 
 const tg = window.Telegram?.WebApp;
@@ -234,7 +233,7 @@ if (photoUrl) {
   avatarEl.textContent = name.slice(0, 2).toUpperCase();
 }
 
-// Tab almashtirish (Tugmalar ishlashi)
+// Tab almashtirish
 document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -253,19 +252,29 @@ function copyRef() {
   });
 }
 
-// Narxni yuklash
+// Narxni yuklash (Render uyg'onishini hisobga olgan holda)
 async function loadPrice() {
+  const priceEl = document.getElementById('price');
+  const subEl = document.getElementById('priceSub');
+  
   try {
     const r = await fetch(`${API}/api/price/XAUUSD`);
     const d = await r.json();
+    
     if (d.price) {
-      document.getElementById('price').textContent = d.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      priceEl.textContent = d.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
       const now = new Date();
       const hh = String((now.getUTCHours()+5)%24).padStart(2,'0');
       const mm = String(now.getUTCMinutes()).padStart(2,'0');
-      document.getElementById('priceSub').textContent = `Jonli narx · ${hh}:${mm} UZT`;
+      subEl.textContent = `Jonli narx · ${hh}:${mm} UZT`;
+    } else if (d.error) {
+      subEl.textContent = "Server xatosi: " + d.error;
     }
-  } catch(e) { console.error("Narx olishda xato:", e); }
+  } catch(e) { 
+    subEl.textContent = "Server uyg'onmoqda... Kuting.";
+    // Agar server uxlayotgan bo'lsa, 5 soniyadan keyin qayta urinamiz
+    setTimeout(loadPrice, 5000);
+  }
 }
 
 // Signalni yuklash
@@ -275,10 +284,9 @@ async function loadSignal() {
     const r = await fetch(`${API}/api/analyze/XAUUSD`);
     const sig = await r.json();
     
-    // Agar signal bo'lmasa yoki xato bo'lsa
     if (!sig || !sig.direction || sig.error) {
       el.className = 'signal-body';
-      el.textContent = "Hali signal yo'q. Bot faqat tasdiqlar yetarli bo'lganda signal beradi.";
+      el.textContent = sig?.error ? `Xato: ${sig.error}` : "Hali signal yo'q. Tasdiqlar kutilmoqda...";
       return;
     }
     
@@ -293,9 +301,9 @@ async function loadSignal() {
       <div class="row"><span class="k">SL</span><span class="v down">$${Number(sig.sl).toFixed(2)}</span></div>
     `;
   } catch(e) {
-    console.error("Signal olishda xato:", e);
     el.className = 'signal-body';
-    el.textContent = "Tahlil qilinmoqda... Iltimos kuting.";
+    el.textContent = "Server uyg'onmoqda... Iltimos kuting.";
+    setTimeout(loadSignal, 5000);
   }
 }
 
