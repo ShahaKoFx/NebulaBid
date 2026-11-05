@@ -1,9 +1,17 @@
 services:
   - type: web
-    name: NebulaBid-bot
-    runtime: python
+    name: nebula-bid
+    env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.11
+      - key: BOT_TOKEN
+        sync: false
+      - key: WEBAPP_URL
+        sync: false
+      - key: WEBHOOK_URL
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: SIGNAL_INTERVAL_SEC
+        value: 300
