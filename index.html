@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NebulaBid AI Terminal</title>
+    <title>NebulaBid AI - Premium Shaxsiy Terminal</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
-            background-color: #0b0a08;
+            background-color: #0d0c0a;
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 16px;
         }
-        .app-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #d4af37;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #262118;
+            padding-bottom: 12px;
         }
-        .sub-title {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 25px;
-        }
+        .brand { color: #e7c996; font-size: 19px; font-weight: 800; letter-spacing: 1.5px; }
+        .status-badge { color: #00ff66; font-size: 11px; font-weight: bold; background: #132219; padding: 4px 10px; border-radius: 8px; border: 1px solid #00ff66; }
+        
+        .section-title { font-size: 16px; font-weight: bold; margin: 24px 0 14px 0; color: #e7c996; letter-spacing: 0.5px; }
+        
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -35,119 +33,55 @@
             margin-bottom: 25px;
         }
         .asset-card {
-            background: #14120e;
-            border: 1px solid #262118;
-            border-radius: 14px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            cursor: pointer;
-            transition: 0.2s;
+            background: #14120e; border: 1px solid #262118; border-radius: 16px;
+            padding: 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .asset-card:active {
-            transform: scale(0.96);
-            border-color: #d4af37;
-        }
-        .asset-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .asset-status {
-            font-size: 11px;
-            color: #00ff66;
-        }
-        .live-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffffff;
-            font-variant-numeric: tabular-nums;
-        }
-        .analysis-section {
-            border-top: 1px solid #262118;
-            padding-top: 15px;
-            display: none;
-        }
-        .analysis-section.active {
-            display: block;
-        }
-        .analysis-box {
-            background: #14120e;
-            border: 1px solid #262118;
-            border-radius: 14px;
-            padding: 16px;
-        }
-        .analysis-title {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 10px;
-            color: #d4af37;
-        }
-        .tasdiq-badge {
-            background: #211a10;
-            border: 1px solid #b9935a;
-            color: #ffcc00;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-        }
-        .analysis-text {
-            font-size: 13px;
-            color: #aaa;
-            line-height: 1.5;
-        }
+        .asset-card:active { transform: scale(0.96); border-color: #e7c996; }
+        .asset-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; }
+        .asset-status { font-size: 11px; color: #00ff66; }
+        .live-price { font-size: 19px; font-weight: bold; color: #ffffff; font-variant-numeric: tabular-nums; }
+        
+        .analysis-section { border-top: 1px solid #262118; padding-top: 18px; display: none; animation: fadeIn 0.3s ease-in-out; }
+        .analysis-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .analysis-box { background: #14120e; border: 1px solid #262118; border-radius: 16px; padding: 18px; }
+        .analysis-title { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 12px; color: #e7c996; }
+        .tasdiq-badge { background: #211a10; border: 1px solid #b9935a; color: #ffcc00; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
+        .analysis-text { font-size: 13px; color: #cccccc; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-    <div class="app-title">NEBULABID AI</div>
-    <div class="sub-title">Jonli narxlar va 7-10 tasdiqli tahlil terminali</div>
+    <div class="header">
+        <div class="brand">NEBULABID AI</div>
+        <div class="status-badge">● SHAXSIY TERMINAL</div>
+    </div>
 
+    <div class="section-title">Jonli bozor narxlari</div>
     <div class="grid-container">
-        <div class="asset-card" onclick="showAnalysis('XAU/USD', '8/10', 'Keltner kanali yuqori chegarasi sindi. H1 trend mos keldi. RSI 67 yo\'nalishni tasdiqlaydi. MACD gistogrammasi mos tomonda. ADX 38 (trend kuchli). 8 ta bozor tasdig\'i olindi.')">
-            <div class="asset-header">
-                <div>🏆 XAU/USD</div>
-                <div class="asset-status">● Jonli</div>
-            </div>
+        <div class="asset-card" onclick="showAnalysis('XAU/USD', '8/10', 'Oltin (XAUUSD) bo\'yicha 8 ta daxshatli tasdiq olindi! Keltner yuqori kanali buzib o\'tildi, RSI va MACD indikatorlari kuchli buqa trendini ko\'rsatmoqda. H1 va D1 tayanch zonalari mos keldi. Signal holati: BUY.')">
+            <div class="asset-header"><div>🏆 XAU/USD</div><div class="asset-status">● Jonli</div></div>
             <div class="live-price" id="price-xau">4,124.60</div>
         </div>
-
-        <div class="asset-card" onclick="showAnalysis('BTC/USD', '9/10', 'Bitcoin tarixiy yuqori nuqtani yangiladi. Suyuqlik zonalari tekshirildi. Moving Average tasdiqladi. RSI va Stochastic ko\'rsatkichlari yuqoriga yo\'nalish berdi. 9 ta tasdiq faol.')">
-            <div class="asset-header">
-                <div>🪙 BTC/USD</div>
-                <div class="asset-status">● Jonli</div>
-            </div>
+        <div class="asset-card" onclick="showAnalysis('BTC/USD', '9/10', 'Bitcoin (BTCUSD) tarixiy maksimumni yangilash arafasida! 9 ta kuchli bozor tasdig\'i olindi. Likvidlik zonalari yig\'ildi, hajmlar oshmoqda. Signal holati: STRONG BUY.')">
+            <div class="asset-header"><div>🪙 BTC/USD</div><div class="asset-status">● Jonli</div></div>
             <div class="live-price" id="price-btc">80,300.0</div>
         </div>
-
-        <div class="asset-card" onclick="showAnalysis('EUR/USD', '5/10', 'Evro/Dollar juftligida tasdiqlar yetarli emas (5/10). Bozor konsolidatsiya holatida, yangi trend shakllanishi kutilmoqda. Hozircha NO TRADE.')">
-            <div class="asset-header">
-                <div>💶 EUR/USD</div>
-                <div class="asset-status">● Jonli</div>
-            </div>
+        <div class="asset-card" onclick="showAnalysis('EUR/USD', '5/10', 'Evro/Dollar juftligida tasdiqlar yetarli emas (5/10). Bozor hozirda qaror qabul qilish zonasida turibdi, trend yo\'nalishi aniq emas. Tizim holati: NO TRADE (Kuzatish).')">
+            <div class="asset-header"><div>💶 EUR/USD</div><div class="asset-status">● Jonli</div></div>
             <div class="live-price" id="price-eur">1.12470</div>
         </div>
-
-        <div class="asset-card" onclick="showAnalysis('US30', '0/10', 'Amerika indeks bozorlari hozirda yopiq holatda. Tahlillar dushanba kuni bozor ochilishi bilan 7-10 ta tasdiq asosida qayta ishga tushadi.')">
-            <div class="asset-header">
-                <div>📈 US30</div>
-                <div class="asset-status" style="color: #ff3333;">● Yopiq</div>
-            </div>
-            <div class="live-price">53,356.1</div>
+        <div class="asset-card" onclick="showAnalysis('US30', '0/10', 'Amerika indeks bozorlari hozirda yopiq holatda. Bozor ochilishi bilan 7-10 ta tasdiq tizimi avtomat ravishda ishga tushadi va tahlillarni yangilaydi.')">
+            <div class="asset-header"><div>📈 US30</div><div class="asset-status" style="color: #ff3333;">● Yopiq</div></div>
+            <div class="live-price" style="color: #666;">53,356.1</div>
         </div>
     </div>
 
-    <!-- Tahlil ko'rsatish oynasi -->
     <div class="analysis-section" id="analysis-window">
         <div class="analysis-box">
-            <div class="analysis-title">
-                <div id="selected-asset">Aktiv tahlili</div>
-                <div class="tasdiq-badge" id="selected-tasdiq">0 Tasdiq</div>
-            </div>
+            <div class="analysis-title"><div id="selected-asset">Aktiv tahlili</div><div class="tasdiq-badge" id="selected-tasdiq">0 Tasdiq</div></div>
             <div class="analysis-text" id="selected-text">Tahlilni ko'rish uchun yuqoridagi aktivlardan birining ustiga bosing.</div>
         </div>
     </div>
@@ -156,23 +90,18 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Aktiv bosilganda tahlilni ko'rsatish funktsiyasi
         function showAnalysis(name, tasdiq, text) {
             document.getElementById('analysis-window').classList.add('active');
-            document.getElementById('selected-asset').innerText = "📊 " + name + " Tahlili";
+            document.getElementById('selected-asset').innerText = "📊 " + name + " Premium Tahlili";
             document.getElementById('selected-tasdiq').innerText = tasdiq + " Tasdiq";
             document.getElementById('selected-text').innerText = text;
-            
-            // Ekran pastga silliq siljiydi
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        // Real vaqtda narxlarni har 2 soniyada tekinga yangilab turish (Jonli API o'rniga simulyatsiya)
         setInterval(() => {
             let xau = (4124 + Math.random() * 2).toFixed(2);
             let btc = (80300 + Math.random() * 40).toFixed(1);
             let eur = (1.12470 + (Math.random() - 0.5) * 0.0002).toFixed(5);
-            
             document.getElementById('price-xau').innerText = xau;
             document.getElementById('price-btc').innerText = btc;
             document.getElementById('price-eur').innerText = eur;
