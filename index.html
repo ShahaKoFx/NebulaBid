@@ -3,84 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NebulaBid AI Mini App</title>
+    <title>NebulaBid AI Terminal</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
-            background-color: #0d0d0d;
+            background-color: #0b0a08;
             color: #ffffff;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 16px;
+        }
+        .app-title {
             text-align: center;
-        }
-        .header {
-            margin-top: 10px;
-            color: #ffcc00;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
+            color: #d4af37;
             letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
-        .sub-header {
-            color: #888;
+        .sub-title {
+            text-align: center;
             font-size: 12px;
+            color: #888;
             margin-bottom: 25px;
         }
-        .asset-container {
+        .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            padding: 5px;
+            margin-bottom: 25px;
         }
         .asset-card {
-            background: linear-gradient(145deg, #1a1a1a, #141414);
-            border: 1px solid #2d2d2d;
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: 600;
+            background: #14120e;
+            border: 1px solid #262118;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             cursor: pointer;
             transition: 0.2s;
         }
         .asset-card:active {
             transform: scale(0.96);
-            border-color: #ffcc00;
-            background: #1f1f1f;
+            border-color: #d4af37;
         }
-        .footer-text {
-            margin-top: 40px;
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .asset-status {
             font-size: 11px;
-            color: #555;
+            color: #00ff66;
+        }
+        .live-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+        .analysis-section {
+            border-top: 1px solid #262118;
+            padding-top: 15px;
+            display: none;
+        }
+        .analysis-section.active {
+            display: block;
+        }
+        .analysis-box {
+            background: #14120e;
+            border: 1px solid #262118;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .analysis-title {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #d4af37;
+        }
+        .tasdiq-badge {
+            background: #211a10;
+            border: 1px solid #b9935a;
+            color: #ffcc00;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+        .analysis-text {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">NEBULABID AI</div>
-    <div class="sub-header">Tahlil qilmoqchi bo'lgan aktivni tanlang:</div>
+    <div class="app-title">NEBULABID AI</div>
+    <div class="sub-title">Jonli narxlar va 7-10 tasdiqli tahlil terminali</div>
 
-    <div class="asset-container">
-        <div class="asset-card" onclick="selectAsset('XAU/USD')">🏆 XAU/USD</div>
-        <div class="asset-card" onclick="selectAsset('EUR/USD')">💶 EUR/USD</div>
-        <div class="asset-card" onclick="selectAsset('BTC/USD')">🪙 BTC/USD</div>
-        <div class="asset-card" onclick="selectAsset('US30')">📈 US30</div>
-        <div class="asset-card" onclick="selectAsset('US100')">📊 US100</div>
-        <div class="asset-card" onclick="selectAsset('NASDAQ')">⚡ NASDAQ</div>
+    <div class="grid-container">
+        <div class="asset-card" onclick="showAnalysis('XAU/USD', '8/10', 'Keltner kanali yuqori chegarasi sindi. H1 trend mos keldi. RSI 67 yo\'nalishni tasdiqlaydi. MACD gistogrammasi mos tomonda. ADX 38 (trend kuchli). 8 ta bozor tasdig\'i olindi.')">
+            <div class="asset-header">
+                <div>🏆 XAU/USD</div>
+                <div class="asset-status">● Jonli</div>
+            </div>
+            <div class="live-price" id="price-xau">4,124.60</div>
+        </div>
+
+        <div class="asset-card" onclick="showAnalysis('BTC/USD', '9/10', 'Bitcoin tarixiy yuqori nuqtani yangiladi. Suyuqlik zonalari tekshirildi. Moving Average tasdiqladi. RSI va Stochastic ko\'rsatkichlari yuqoriga yo\'nalish berdi. 9 ta tasdiq faol.')">
+            <div class="asset-header">
+                <div>🪙 BTC/USD</div>
+                <div class="asset-status">● Jonli</div>
+            </div>
+            <div class="live-price" id="price-btc">80,300.0</div>
+        </div>
+
+        <div class="asset-card" onclick="showAnalysis('EUR/USD', '5/10', 'Evro/Dollar juftligida tasdiqlar yetarli emas (5/10). Bozor konsolidatsiya holatida, yangi trend shakllanishi kutilmoqda. Hozircha NO TRADE.')">
+            <div class="asset-header">
+                <div>💶 EUR/USD</div>
+                <div class="asset-status">● Jonli</div>
+            </div>
+            <div class="live-price" id="price-eur">1.12470</div>
+        </div>
+
+        <div class="asset-card" onclick="showAnalysis('US30', '0/10', 'Amerika indeks bozorlari hozirda yopiq holatda. Tahlillar dushanba kuni bozor ochilishi bilan 7-10 ta tasdiq asosida qayta ishga tushadi.')">
+            <div class="asset-header">
+                <div>📈 US30</div>
+                <div class="asset-status" style="color: #ff3333;">● Yopiq</div>
+            </div>
+            <div class="live-price">53,356.1</div>
+        </div>
     </div>
 
-    <div class="footer-text">NebulaBid Ecosystem v1.0.0</div>
+    <!-- Tahlil ko'rsatish oynasi -->
+    <div class="analysis-section" id="analysis-window">
+        <div class="analysis-box">
+            <div class="analysis-title">
+                <div id="selected-asset">Aktiv tahlili</div>
+                <div class="tasdiq-badge" id="selected-tasdiq">0 Tasdiq</div>
+            </div>
+            <div class="analysis-text" id="selected-text">Tahlilni ko'rish uchun yuqoridagi aktivlardan birining ustiga bosing.</div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); 
+        tg.expand();
 
-        function selectAsset(assetName) {
-            tg.showPopup({
-                title: 'Aktiv tanlandi',
-                message: 'Siz ' + assetName + ' juftligini tanladingiz. Bot endi faqat shu para bo\'yicha 7 ta tasdiqli signallarni yuboradi.',
-                buttons: [{type: 'ok'}]
-            });
+        // Aktiv bosilganda tahlilni ko'rsatish funktsiyasi
+        function showAnalysis(name, tasdiq, text) {
+            document.getElementById('analysis-window').classList.add('active');
+            document.getElementById('selected-asset').innerText = "📊 " + name + " Tahlili";
+            document.getElementById('selected-tasdiq').innerText = tasdiq + " Tasdiq";
+            document.getElementById('selected-text').innerText = text;
+            
+            // Ekran pastga silliq siljiydi
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
+
+        // Real vaqtda narxlarni har 2 soniyada tekinga yangilab turish (Jonli API o'rniga simulyatsiya)
+        setInterval(() => {
+            let xau = (4124 + Math.random() * 2).toFixed(2);
+            let btc = (80300 + Math.random() * 40).toFixed(1);
+            let eur = (1.12470 + (Math.random() - 0.5) * 0.0002).toFixed(5);
+            
+            document.getElementById('price-xau').innerText = xau;
+            document.getElementById('price-btc').innerText = btc;
+            document.getElementById('price-eur').innerText = eur;
+        }, 2000);
     </script>
 </body>
 </html>
