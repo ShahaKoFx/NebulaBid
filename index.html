@@ -463,10 +463,20 @@ if (tg) {
 const user = tg?.initDataUnsafe?.user;
 const name = user?.first_name || 'Trader';
 const userId = user?.id || 0;
+const photoUrl = user?.photo_url;
+
 document.getElementById('userName').textContent = name;
 document.getElementById('userName2').textContent = name;
-document.getElementById('avatar').textContent = name.slice(0, 2).toUpperCase();
-document.getElementById('refLink').textContent = `https://t.me/NebulaBid_airobot?start=ref_${userId}`;
+
+const avatarEl = document.getElementById('avatar');
+if (photoUrl) {
+  avatarEl.style.backgroundImage = `url(${photoUrl})`;
+  avatarEl.style.backgroundSize = 'cover';
+  avatarEl.style.backgroundPosition = 'center';
+  avatarEl.textContent = '';
+} else {
+  avatarEl.textContent = name.slice(0, 2).toUpperCase();
+}
 
 // Tab switching
 document.querySelectorAll('.nav-item').forEach(btn => {
