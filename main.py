@@ -41,7 +41,11 @@ async def lifespan(app: FastAPI):
     await bot.session.close()
 
 app = FastAPI(lifespan=lifespan)
-
+@app.get("/")
+@app.head("/")
+async def health():
+    return {"status": "ok"}
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
