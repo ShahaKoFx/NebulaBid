@@ -1,22 +1,26 @@
 from fastapi import APIRouter
-import random
+from fastapi.concurrency import run_in_threadpool
+from engine.analyzer import analyze
+from engine.market import fetch
 
 router = APIRouter()
 
 @router.get("/api/analyze/{pair}")
 async def analyze_pair(pair: str):
-    # VAQTINCHALIK TEST KODI
-    return {
-        "direction": "buy",
-        "confirmations": 8,
-        "confidence": 85,
-        "entry": 2350.50,
-        "tp": 2365.00,
-        "sl": 2340.00,
-        "reasons": ["EMA Trend yuqoriga", "RSI 55 (Neytral)", "MACD kesishdi", "ADX kuchli"]
-    }
+    try:
+        # Tahlilni orqa fonda ishlatamiz (serverni qotirmasligi uchun)
+        sig = await run_in_threadpool(analyze, pair.upper())
+        return sig or {"signal": None}
+    except Exception as e:
+        return {"error": str(e)}
 
 @router.get("/api/price/{pair}")
 async def price(pair: str):
-    # VAQTINCHALIK TEST KODI
-    return {"price": 2350.50 + random.uniform(-2, 2)}
+    try:
+        # Narxni orqa fonda olamiz
+        df = await run_in_threadpool(fetch, pair.upper(), "15m", "1d")
+        if df.empty: 
+            return {"error": "Ma'lumot topilmadi (Yahoo bloklagan bo'lishi mumkin)"}
+        return {"price": float(df["close"].iloc[-1])}
+    except Exception as e:
+        return {"error": str(e)}
