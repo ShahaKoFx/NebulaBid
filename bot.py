@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
 # BotFather bergan uzun tokenni shu yerga qo'shtirnoq ichiga yozasiz
-API_TOKEN = '74839201:AAHjg_misol_uchun' # <--- O'zingizning Tokeningizni qo'ying
+API_TOKEN = '9013600582:AAHYCUtaTSA_eJYWpGZuDsBZzWZq__G1on4' # <--- O'zingizning Tokeningizni qo'ying
 
 # Log tizimini sozlash
 logging.basicConfig(level=logging.INFO)
