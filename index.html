@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NebulaBid AI Mini App</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+        }
+        .header {
+            margin-top: 10px;
+            color: #ffcc00;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .sub-header {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 25px;
+        }
+        .asset-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 5px;
+        }
+        .asset-card {
+            background: linear-gradient(145deg, #1a1a1a, #141414);
+            border: 1px solid #2d2d2d;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .asset-card:active {
+            transform: scale(0.96);
+            border-color: #ffcc00;
+            background: #1f1f1f;
+        }
+        .footer-text {
+            margin-top: 40px;
+            font-size: 11px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">NEBULABID AI</div>
+    <div class="sub-header">Tahlil qilmoqchi bo'lgan aktivni tanlang:</div>
+
+    <div class="asset-container">
+        <div class="asset-card" onclick="selectAsset('XAU/USD')">🏆 XAU/USD</div>
+        <div class="asset-card" onclick="selectAsset('EUR/USD')">💶 EUR/USD</div>
+        <div class="asset-card" onclick="selectAsset('BTC/USD')">🪙 BTC/USD</div>
+        <div class="asset-card" onclick="selectAsset('US30')">📈 US30</div>
+        <div class="asset-card" onclick="selectAsset('US100')">📊 US100</div>
+        <div class="asset-card" onclick="selectAsset('NASDAQ')">⚡ NASDAQ</div>
+    </div>
+
+    <div class="footer-text">NebulaBid Ecosystem v1.0.0</div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); 
+
+        function selectAsset(assetName) {
+            tg.showPopup({
+                title: 'Aktiv tanlandi',
+                message: 'Siz ' + assetName + ' juftligini tanladingiz. Bot endi faqat shu para bo\'yicha 7 ta tasdiqli signallarni yuboradi.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+    </script>
+</body>
+</html>
