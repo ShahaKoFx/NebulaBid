@@ -1,111 +1,564 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NebulaBid AI - Premium Shaxsiy Terminal</title>
-    <script src="https://telegram.org"></script>
-    <style>
-        body {
-            background-color: #0d0c0a;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 16px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-            border-bottom: 1px solid #262118;
-            padding-bottom: 12px;
-        }
-        .brand { color: #e7c996; font-size: 19px; font-weight: 800; letter-spacing: 1.5px; }
-        .status-badge { color: #00ff66; font-size: 11px; font-weight: bold; background: #132219; padding: 4px 10px; border-radius: 8px; border: 1px solid #00ff66; }
-        
-        .section-title { font-size: 16px; font-weight: bold; margin: 24px 0 14px 0; color: #e7c996; letter-spacing: 0.5px; }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        .asset-card {
-            background: #14120e; border: 1px solid #262118; border-radius: 16px;
-            padding: 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .asset-card:active { transform: scale(0.96); border-color: #e7c996; }
-        .asset-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; }
-        .asset-status { font-size: 11px; color: #00ff66; }
-        .live-price { font-size: 19px; font-weight: bold; color: #ffffff; font-variant-numeric: tabular-nums; }
-        
-        .analysis-section { border-top: 1px solid #262118; padding-top: 18px; display: none; animation: fadeIn 0.3s ease-in-out; }
-        .analysis-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NebulaBid AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0a0a0a;
+  --card: #111111;
+  --card-2: #161616;
+  --gold: #d4af37;
+  --gold-light: #f4d03f;
+  --gold-dark: #a8842a;
+  --text: #ffffff;
+  --muted: #7a7a7a;
+  --green: #22c55e;
+  --red: #ef4444;
+  --border: rgba(212, 175, 55, 0.22);
+}
+html, body { background: var(--bg); color: var(--text); }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 110px;
+  overflow-x: hidden;
+}
+.app { max-width: 480px; margin: 0 auto; padding: 14px; }
 
-        .analysis-box { background: #14120e; border: 1px solid #262118; border-radius: 16px; padding: 18px; }
-        .analysis-title { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 12px; color: #e7c996; }
-        .tasdiq-badge { background: #211a10; border: 1px solid #b9935a; color: #ffcc00; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
-        .analysis-text { font-size: 13px; color: #cccccc; line-height: 1.6; }
-    </style>
+/* TOP BAR */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 0 14px;
+}
+.title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--gold);
+}
+.top-actions { display: flex; gap: 8px; }
+.top-btn {
+  background: none; border: none; color: var(--muted);
+  font-size: 18px; cursor: pointer; padding: 2px 6px;
+}
+
+/* USER ROW */
+.user-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #2a2a2a, #0f0f0f);
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: var(--gold); font-size: 15px;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.greet { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.greet b { color: var(--text); font-weight: 700; }
+.brand {
+  font-size: 14px; font-weight: 800; letter-spacing: 0.5px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-top: 2px;
+}
+.user-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.pill {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  padding: 4px 9px; border-radius: 20px;
+  border: 1px solid var(--gold); color: var(--gold);
+  background: rgba(212,175,55,0.05);
+}
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--card); border: 1px solid #222;
+  color: var(--muted); font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* BALANCE CARD */
+.balance-card {
+  background: linear-gradient(135deg, #1a1508 0%, #0d0d0d 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 18px;
+  margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.balance-card::before {
+  content: ''; position: absolute; top: -60%; right: -20%;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(212,175,55,0.18), transparent 70%);
+  pointer-events: none;
+}
+.balance-top {
+  display: flex; justify-content: space-between;
+  font-size: 10px; letter-spacing: 1.5px; color: var(--muted);
+  margin-bottom: 14px;
+  position: relative;
+}
+.balance-value {
+  font-size: 38px; font-weight: 800;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+  position: relative;
+}
+.balance-sub {
+  font-size: 10px; letter-spacing: 1px; color: var(--muted);
+  margin-bottom: 14px;
+  position: relative;
+}
+.balance-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px;
+  position: relative;
+}
+.balance-bottom .name { color: var(--text); font-weight: 700; }
+.balance-bottom .type { color: var(--gold); font-weight: 700; }
+
+/* MARKET CARD */
+.market-card {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 16px; padding: 16px;
+  margin-bottom: 14px;
+}
+.market-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.pair { font-size: 14px; font-weight: 600; }
+.live {
+  font-size: 10px; color: var(--green);
+  background: rgba(34,197,94,0.1);
+  padding: 3px 8px; border-radius: 10px;
+  font-weight: 600;
+}
+.price {
+  font-size: 30px; font-weight: 800;
+  color: var(--text); margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+.price-sub { font-size: 11px; color: var(--muted); }
+
+/* SIGNAL CARD */
+.signal-card {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 16px; padding: 16px;
+  margin-bottom: 20px;
+}
+.signal-title {
+  font-size: 14px; font-weight: 700; margin-bottom: 10px;
+}
+.signal-body {
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+
+/* SIGNAL ACTIVE */
+.signal-active .dir {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 8px; margin-bottom: 10px;
+}
+.signal-active .dir.buy { background: rgba(34,197,94,0.15); color: var(--green); }
+.signal-active .dir.sell { background: rgba(239,68,68,0.15); color: #ef4444; }
+.signal-active .bar {
+  font-family: monospace; color: var(--gold);
+  font-size: 13px; letter-spacing: 1px; margin: 6px 0;
+}
+.signal-active .row {
+  display: flex; justify-content: space-between;
+  padding: 6px 0; font-size: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.signal-active .row:last-child { border-bottom: none; }
+.signal-active .row .k { color: var(--muted); }
+.signal-active .row .v { font-weight: 600; }
+.signal-active .row .v.up { color: var(--green); }
+.signal-active .row .v.down { color: #ef4444; }
+
+/* FOOTER */
+.footer {
+  text-align: center; font-size: 11px; color: var(--muted);
+  padding: 8px 0 16px;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed; bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px); max-width: 456px;
+  background: rgba(18,18,18,0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #222;
+  border-radius: 24px;
+  display: flex; justify-content: space-around;
+  padding: 8px 4px;
+  z-index: 100;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+.nav-item {
+  background: none; border: none; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 4px 6px; cursor: pointer;
+  border-radius: 12px; min-width: 50px;
+  transition: all 0.2s;
+}
+.nav-icon { font-size: 16px; line-height: 1; }
+.nav-icon-wrap {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(212,175,55,0.4);
+  margin-top: -12px;
+  margin-bottom: 2px;
+}
+.nav-label { font-size: 9px; font-weight: 600; }
+.nav-item.active { color: var(--gold); }
+.nav-item.active .nav-label { color: var(--gold); }
+
+/* TAB PAGES */
+.tab-page { display: none; }
+.tab-page.active { display: block; }
+
+/* STATS */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 14px;
+}
+.stat-card {
+  background: var(--card); border: 1px solid #1e1e1e;
+  border-radius: 14px; padding: 14px;
+}
+.stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-size: 20px; font-weight: 800; margin-top: 6px; color: var(--gold); }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+
+/* ANALYSIS */
+.analysis-item {
+  background: var(--card); border: 1px solid #1e1e1e;
+  border-radius: 12px; padding: 12px;
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.analysis-item .k { font-size: 12px; color: var(--muted); }
+.analysis-item .v { font-size: 13px; font-weight: 700; }
+.analysis-item .v.up { color: var(--green); }
+.analysis-item .v.down { color: var(--red); }
+
+/* REFERRAL */
+.ref-card {
+  background: linear-gradient(135deg, #1a1508 0%, #0d0d0d 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.ref-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--gold); }
+.ref-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+.ref-link {
+  background: #0a0a0a; border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+  font-size: 11px; color: var(--gold);
+  word-break: break-all; margin-bottom: 12px;
+  font-family: monospace;
+}
+.ref-btn {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  border: none; border-radius: 12px;
+  padding: 12px 24px; font-weight: 700; font-size: 13px;
+  color: #000; cursor: pointer; width: 100%;
+}
+
+/* PANEL */
+.panel-item {
+  background: var(--card); border: 1px solid #1e1e1e;
+  border-radius: 14px; padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer;
+}
+.panel-item .label { font-size: 13px; }
+.panel-item .arrow { color: var(--muted); font-size: 16px; }
+</style>
 </head>
 <body>
+<div class="app">
 
-    <div class="header">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="title">NEBULABID AI</div>
+    <div class="top-actions">
+      <button class="top-btn">⋮</button>
+      <button class="top-btn" onclick="tg?.close()">✕</button>
+    </div>
+  </header>
+
+  <!-- ========== TAB: ASOSIY ========== -->
+  <div class="tab-page active" id="tab-home">
+    <!-- USER ROW -->
+    <div class="user-row">
+      <div class="avatar" id="avatar">N</div>
+      <div class="user-info">
+        <div class="greet">Xayrli kun, <b id="userName">Trader</b></div>
         <div class="brand">NEBULABID AI</div>
-        <div class="status-badge">● SHAXSIY TERMINAL</div>
+      </div>
+      <div class="user-actions">
+        <span class="pill">ODDIY</span>
+        <button class="icon-btn">🔔</button>
+        <button class="icon-btn">⚙️</button>
+      </div>
     </div>
 
-    <div class="section-title">Jonli bozor narxlari</div>
-    <div class="grid-container">
-        <div class="asset-card" onclick="showAnalysis('XAU/USD', '8/10', 'Oltin (XAUUSD) bo\'yicha 8 ta daxshatli tasdiq olindi! Keltner yuqori kanali buzib o\'tildi, RSI va MACD indikatorlari kuchli buqa trendini ko\'rsatmoqda. H1 va D1 tayanch zonalari mos keldi. Signal holati: BUY.')">
-            <div class="asset-header"><div>🏆 XAU/USD</div><div class="asset-status">● Jonli</div></div>
-            <div class="live-price" id="price-xau">4,124.60</div>
-        </div>
-        <div class="asset-card" onclick="showAnalysis('BTC/USD', '9/10', 'Bitcoin (BTCUSD) tarixiy maksimumni yangilash arafasida! 9 ta kuchli bozor tasdig\'i olindi. Likvidlik zonalari yig\'ildi, hajmlar oshmoqda. Signal holati: STRONG BUY.')">
-            <div class="asset-header"><div>🪙 BTC/USD</div><div class="asset-status">● Jonli</div></div>
-            <div class="live-price" id="price-btc">80,300.0</div>
-        </div>
-        <div class="asset-card" onclick="showAnalysis('EUR/USD', '5/10', 'Evro/Dollar juftligida tasdiqlar yetarli emas (5/10). Bozor hozirda qaror qabul qilish zonasida turibdi, trend yo\'nalishi aniq emas. Tizim holati: NO TRADE (Kuzatish).')">
-            <div class="asset-header"><div>💶 EUR/USD</div><div class="asset-status">● Jonli</div></div>
-            <div class="live-price" id="price-eur">1.12470</div>
-        </div>
-        <div class="asset-card" onclick="showAnalysis('US30', '0/10', 'Amerika indeks bozorlari hozirda yopiq holatda. Bozor ochilishi bilan 7-10 ta tasdiq tizimi avtomat ravishda ishga tushadi va tahlillarni yangilaydi.')">
-            <div class="asset-header"><div>📈 US30</div><div class="asset-status" style="color: #ff3333;">● Yopiq</div></div>
-            <div class="live-price" style="color: #666;">53,356.1</div>
-        </div>
+    <!-- BALANCE CARD -->
+    <div class="balance-card">
+      <div class="balance-top">
+        <span>NEBULABID</span>
+        <span>STANDART</span>
+      </div>
+      <div class="balance-value" id="balanceValue">+0.00R</div>
+      <div class="balance-sub">OY NATIJASI · 0% YUTUQ</div>
+      <div class="balance-bottom">
+        <span class="name" id="userName2">Trader</span>
+        <span class="type">Oddiy</span>
+      </div>
     </div>
 
-    <div class="analysis-section" id="analysis-window">
-        <div class="analysis-box">
-            <div class="analysis-title"><div id="selected-asset">Aktiv tahlili</div><div class="tasdiq-badge" id="selected-tasdiq">0 Tasdiq</div></div>
-            <div class="analysis-text" id="selected-text">Tahlilni ko'rish uchun yuqoridagi aktivlardan birining ustiga bosing.</div>
-        </div>
+    <!-- MARKET CARD -->
+    <div class="market-card">
+      <div class="market-top">
+        <span class="pair">XAU/USD</span>
+        <span class="live">● Jonli</span>
+      </div>
+      <div class="price" id="price">—</div>
+      <div class="price-sub" id="priceSub">Jonli narx · —</div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    <!-- SIGNAL CARD -->
+    <div class="signal-card">
+      <div class="signal-title">So'nggi signal</div>
+      <div class="signal-body" id="signalBody">
+        Hali signal yo'q. Bot faqat tasdiqlar yetarli bo'lganda signal beradi.
+      </div>
+    </div>
 
-        function showAnalysis(name, tasdiq, text) {
-            document.getElementById('analysis-window').classList.add('active');
-            document.getElementById('selected-asset').innerText = "📊 " + name + " Premium Tahlili";
-            document.getElementById('selected-tasdiq').innerText = tasdiq + " Tasdiq";
-            document.getElementById('selected-text').innerText = text;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
+    <div class="footer">@NebulaBid_airobot</div>
+  </div>
 
-        setInterval(() => {
-            let xau = (4124 + Math.random() * 2).toFixed(2);
-            let btc = (80300 + Math.random() * 40).toFixed(1);
-            let eur = (1.12470 + (Math.random() - 0.5) * 0.0002).toFixed(5);
-            document.getElementById('price-xau').innerText = xau;
-            document.getElementById('price-btc').innerText = btc;
-            document.getElementById('price-eur').innerText = eur;
-        }, 2000);
-    </script>
+  <!-- ========== TAB: NATIJA ========== -->
+  <div class="tab-page" id="tab-stats">
+    <h2 style="font-size:18px;margin-bottom:16px;">📊 Natijalar</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Jami signallar</div>
+        <div class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Foydali</div>
+        <div class="stat-value green">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Zararli</div>
+        <div class="stat-value red">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value">0%</div>
+      </div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-title">Signal tarixi</div>
+      <div class="signal-body">Hali signal yo'q.</div>
+    </div>
+  </div>
+
+  <!-- ========== TAB: AI ========== -->
+  <div class="tab-page" id="tab-ai">
+    <h2 style="font-size:18px;margin-bottom:16px;">✨ AI Tahlil</h2>
+    <div id="analysisList">
+      <div class="analysis-item"><span class="k">EMA Trend</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">RSI</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">MACD</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">ADX</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">Bollinger</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">Keltner</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">Stochastic</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">Volume</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">H1 Trend</span><span class="v">—</span></div>
+      <div class="analysis-item"><span class="k">Price Action</span><span class="v">—</span></div>
+    </div>
+  </div>
+
+  <!-- ========== TAB: COPY ========== -->
+  <div class="tab-page" id="tab-copy">
+    <h2 style="font-size:18px;margin-bottom:16px;">🏆 Copy Trading</h2>
+    <div class="signal-card">
+      <div class="signal-title">Copy Trading</div>
+      <div class="signal-body">Tez orada. Bu bo'limda boshqa treyderlarning signallarini avtomatik nusxalash imkoniyati bo'ladi.</div>
+    </div>
+  </div>
+
+  <!-- ========== TAB: REFERAL ========== -->
+  <div class="tab-page" id="tab-ref">
+    <h2 style="font-size:18px;margin-bottom:16px;">👤 Referal</h2>
+    <div class="ref-card">
+      <div class="ref-title">Do'stlaringizni taklif qiling</div>
+      <div class="ref-desc">Har bir taklif qilingan do'st uchun bonus oling. Referal havolangizni ulashing.</div>
+      <div class="ref-link" id="refLink">https://t.me/NebulaBid_airobot?start=ref_0</div>
+      <button class="ref-btn" onclick="copyRef()">📋 Havolani nusxalash</button>
+    </div>
+  </div>
+
+  <!-- ========== TAB: PANEL ========== -->
+  <div class="tab-page" id="tab-panel">
+    <h2 style="font-size:18px;margin-bottom:16px;">▦ Panel</h2>
+    <div class="panel-item"><span class="label">🌐 Til</span><span class="arrow">›</span></div>
+    <div class="panel-item"><span class="label">📊 Juftliklar</span><span class="arrow">›</span></div>
+    <div class="panel-item"><span class="label">🔔 Bildirishnomalar</span><span class="arrow">›</span></div>
+    <div class="panel-item"><span class="label">💳 Hisob turi</span><span class="arrow">›</span></div>
+    <div class="panel-item"><span class="label">📞 Yordam</span><span class="arrow">›</span></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="home">
+      <span class="nav-icon-wrap">🏠</span>
+      <span class="nav-label">Asosiy</span>
+    </button>
+    <button class="nav-item" data-tab="stats">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Natija</span>
+    </button>
+    <button class="nav-item" data-tab="ai">
+      <span class="nav-icon">✨</span>
+      <span class="nav-label">AI</span>
+    </button>
+    <button class="nav-item" data-tab="copy">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">Copy</span>
+    </button>
+    <button class="nav-item" data-tab="ref">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Referal</span>
+    </button>
+    <button class="nav-item" data-tab="panel">
+      <span class="nav-icon">▦</span>
+      <span class="nav-label">Panel</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+// ⚠️ BU YERGA RENDER URL YOZ (oxirida / yo'q!)
+const API = "https://nebula-bid.onrender.com";
+
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor('#0a0a0a');
+  tg.setBackgroundColor('#0a0a0a');
+}
+
+// User info
+const user = tg?.initDataUnsafe?.user;
+const name = user?.first_name || 'Trader';
+const userId = user?.id || 0;
+document.getElementById('userName').textContent = name;
+document.getElementById('userName2').textContent = name;
+document.getElementById('avatar').textContent = name.slice(0, 2).toUpperCase();
+document.getElementById('refLink').textContent = `https://t.me/NebulaBid_airobot?start=ref_${userId}`;
+
+// Tab switching
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+    const tab = btn.dataset.tab;
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+  });
+});
+
+// Copy referral
+function copyRef() {
+  const link = document.getElementById('refLink').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    alert('Havola nusxalandi!');
+  });
+}
+
+// Load price
+async function loadPrice() {
+  try {
+    const r = await fetch(`${API}/api/price/XAUUSD`);
+    const d = await r.json();
+    if (d.price) {
+      document.getElementById('price').textContent =
+        d.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      const now = new Date();
+      const hh = String((now.getUTCHours()+5)%24).padStart(2,'0');
+      const mm = String(now.getUTCMinutes()).padStart(2,'0');
+      document.getElementById('priceSub').textContent = `Jonli narx · ${hh}:${mm} UZT`;
+    }
+  } catch(e) { console.error(e); }
+}
+
+// Load signal
+async function loadSignal() {
+  const el = document.getElementById('signalBody');
+  try {
+    const r = await fetch(`${API}/api/analyze/XAUUSD`);
+    const sig = await r.json();
+    if (!sig || !sig.direction) {
+      el.className = 'signal-body';
+      el.textContent = "Hali signal yo'q. Bot faqat tasdiqlar yetarli bo'lganda signal beradi.";
+      return;
+    }
+    const bar = '█'.repeat(sig.confirmations) + '░'.repeat(10 - sig.confirmations);
+    const dirTxt = sig.direction === 'buy' ? '🟢 BUY' : '🔴 SELL';
+    el.className = 'signal-body signal-active';
+    el.innerHTML = `
+      <div class="dir ${sig.direction}">${dirTxt} • XAU/USD • M15</div>
+      <div class="bar">${bar} ${sig.confidence}% (${sig.confirmations} tasdiq)</div>
+      <div class="row"><span class="k">Kirish</span><span class="v">$${sig.entry.toFixed(2)}</span></div>
+      <div class="row"><span class="k">TP</span><span class="v up">$${sig.tp.toFixed(2)}</span></div>
+      <div class="row"><span class="k">SL</span><span class="v down">$${sig.sl.toFixed(2)}</span></div>
+    `;
+  } catch(e) {
+    el.textContent = "Xatolik. Qayta urinib ko'ring.";
+  }
+}
+
+// Load analysis
+async function loadAnalysis() {
+  try {
+    const r = await fetch(`${API}/api/analyze/XAUUSD`);
+    const sig = await r.json();
+    if (!sig || !sig.reasons) return;
+    const list = document.getElementById('analysisList');
+    const items = sig.reasons.map(r => 
+      `<div class="analysis-item"><span class="k">${r}</span><span class="v up">✓</span></div>`
+    ).join('');
+    list.innerHTML = items || list.innerHTML;
+  } catch(e) {}
+}
+
+// Init
+loadPrice();
+loadSignal();
+loadAnalysis();
+setInterval(loadPrice, 30000);
+setInterval(loadSignal, 60000);
+</script>
 </body>
 </html>
