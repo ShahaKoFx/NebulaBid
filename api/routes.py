@@ -8,7 +8,6 @@ router = APIRouter()
 @router.get("/api/analyze/{pair}")
 async def analyze_pair(pair: str):
     try:
-        # Tahlilni orqa fonda ishlatamiz (serverni qotirmasligi uchun)
         sig = await run_in_threadpool(analyze, pair.upper())
         return sig or {"signal": None}
     except Exception as e:
@@ -17,7 +16,6 @@ async def analyze_pair(pair: str):
 @router.get("/api/price/{pair}")
 async def price(pair: str):
     try:
-        # Narxni orqa fonda olamiz
         df = await run_in_threadpool(fetch, pair.upper(), "15m", "1d")
         if df.empty: 
             return {"error": "Ma'lumot topilmadi (Yahoo bloklagan bo'lishi mumkin)"}
